@@ -12,10 +12,10 @@ export type UseDeferUntilCalledCountOptions<
   onReadyCount?: number;
 
   /**
-   * errorになる為のonErrorの呼び出し回数
+   * fallbackになる為のonFallbackの呼び出し回数
    * 未指定の場合は1回
    */
-  onErrorCount?: number;
+  onFallbackCount?: number;
 
   /**
    * pendingになる為のonPendingの呼び出し回数

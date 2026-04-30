@@ -8,7 +8,7 @@ import type { UseDeferUntilCalledCountOptions } from './types';
  * 戻り値として返す`onReady`が実行されるまで描画を遅延させるhook
  * @param target 描画対象のノード
  * @param options オプション
- * @returns state（'pending', 'ready', 'error'）と状態に応じたノードと状態変更用のハンドラー
+ * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノードと状態変更用のハンドラー
  */
 export default function useDeferUntilCalledCount<T extends ReactNode, P, E>(
   target: T,
@@ -16,22 +16,22 @@ export default function useDeferUntilCalledCount<T extends ReactNode, P, E>(
 ): DeferRenderingWithHandlersResult<T | P | E> {
   const {
     onPendingCount = 1,
-    onErrorCount = 1,
+    onFallbackCount = 1,
     onReadyCount = 1,
     ...opts
   } = options;
   const {
     onPending: handlePending,
-    onError: handleError,
+    onFallback: handleFallback,
     onReady: handleReady,
     ...rest
   } = useDeferUntilOnReady(target, opts);
   const pendingContRef = useRef(0);
-  const errorContRef = useRef(0);
+  const fallbackContRef = useRef(0);
   const readyContRef = useRef(0);
   const reset = useCallback(() => {
     pendingContRef.current = 0;
-    errorContRef.current = 0;
+    fallbackContRef.current = 0;
     readyContRef.current = 0;
   }, []);
   const onPending = useCallback(() => {
@@ -41,13 +41,13 @@ export default function useDeferUntilCalledCount<T extends ReactNode, P, E>(
       handlePending();
     }
   }, [handlePending, onPendingCount]);
-  const onError = useCallback(() => {
-    errorContRef.current += 1;
-    if (onErrorCount <= errorContRef.current) {
+  const onFallback = useCallback(() => {
+    fallbackContRef.current += 1;
+    if (onFallbackCount <= fallbackContRef.current) {
       reset();
-      handleError();
+      handleFallback();
     }
-  }, [handleError, onErrorCount]);
+  }, [handleFallback, onFallbackCount]);
   const onReady = useCallback(() => {
     readyContRef.current += 1;
     if (onReadyCount <= readyContRef.current) {
@@ -59,7 +59,7 @@ export default function useDeferUntilCalledCount<T extends ReactNode, P, E>(
   return {
     ...rest,
     onPending,
-    onError,
+    onFallback,
     onReady,
   };
 }

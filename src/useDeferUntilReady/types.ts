@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import type { DeferRenderingWithErrorOptionsBase } from '../types';
+import type { DeferRenderingWithFallbackOptionsBase } from '../types';
 
 export type UseDeferUntilReadyOptions<
   P extends ReactNode = ReactNode,
   E extends ReactNode = ReactNode,
-> = DeferRenderingWithErrorOptionsBase<P, E>;
+> = DeferRenderingWithFallbackOptionsBase<P, E>;

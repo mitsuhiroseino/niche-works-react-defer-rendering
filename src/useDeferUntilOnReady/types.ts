@@ -12,10 +12,10 @@ export type UseDeferUntilOnReadyOptions<
   onReadyDelay?: number;
 
   /**
-   * onErrorのデバウンス時間（ミリ秒）
+   * onFallbackのデバウンス時間（ミリ秒）
    * 未指定の場合は即時処理
    */
-  onErrorDelay?: number;
+  onFallbackDelay?: number;
 
   /**
    * onPendingのデバウンス時間（ミリ秒）

@@ -11,7 +11,7 @@ import type { UseDeferUntilFontReadyOptions } from './types';
  * @param target 描画対象のノード
  * @param fontFamily フォントファミリー
  * @param options オプション
- * @returns state（'pending', 'ready', 'error'）と状態に応じたノード
+ * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノード
  */
 export default function useDeferUntilFontReady<T extends ReactNode, P, E>(
   target: T,
@@ -33,7 +33,7 @@ export default function useDeferUntilFontReady<T extends ReactNode, P, E>(
         })
         .catch(() => {
           if (isMounted()) {
-            setState('error');
+            setState('fallback');
           }
         });
     };
@@ -44,7 +44,7 @@ export default function useDeferUntilFontReady<T extends ReactNode, P, E>(
         .then(() => observe())
         .catch(() => {
           if (isMounted()) {
-            setState('error');
+            setState('fallback');
           }
         });
     } else {

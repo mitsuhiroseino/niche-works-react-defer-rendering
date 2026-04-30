@@ -7,9 +7,9 @@ import type { UseDeferUntilReadyOptions } from './types';
 /**
  * ステートが'ready'になるまで描画を遅延させるhook
  * @param target 描画対象のノード
- * @param state ステート（'pending', 'ready', 'error'）
+ * @param state ステート（'pending', 'ready', 'fallback'）
  * @param options オプション
- * @returns state（'pending', 'ready', 'error'）と状態に応じたノード
+ * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノード
  */
 export default function useDeferUntilReady<T extends ReactNode, P, E>(
   target: T,
@@ -18,11 +18,11 @@ export default function useDeferUntilReady<T extends ReactNode, P, E>(
 ): DeferRenderingResult<T | P | E> {
   const {
     pending,
-    error,
+    fallback,
     pendingDefer,
-    errorDefer,
+    fallbackDefer,
     readyDefer,
-    preserveOnceError,
+    preserveOnceFallback,
     preserveOnceReady,
   } = options;
   const latestStateRef = useRef<RenderingState>(null);
@@ -31,15 +31,15 @@ export default function useDeferUntilReady<T extends ReactNode, P, E>(
   if (preserveOnceReady && latestState === 'ready') {
     // 一度readyになったらready状態を保持する
     currentState = latestState;
-  } else if (preserveOnceError && latestState === 'error') {
-    // 一度errorになったらerror状態を保持する
+  } else if (preserveOnceFallback && latestState === 'fallback') {
+    // 一度fallbackになったらfallback状態を保持する
     currentState = latestState;
   }
   latestStateRef.current = currentState;
   // currentに応じたノードと遅延時間を取得
   const nextInfo = {
     pending: { nextNode: pending, defer: pendingDefer },
-    error: { nextNode: error, defer: errorDefer },
+    fallback: { nextNode: fallback, defer: fallbackDefer },
     ready: { nextNode: target, defer: readyDefer },
   }[currentState];
   const nextRef = useRef(nextInfo);

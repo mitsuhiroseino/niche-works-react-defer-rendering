@@ -29,34 +29,34 @@ export type DeferRenderingOptionsBase<P extends ReactNode> = {
 };
 
 /**
- * オプションのベース(エラー有り)
+ * オプションのベース(フォールバック有り)
  */
-export type DeferRenderingWithErrorOptionsBase<
+export type DeferRenderingWithFallbackOptionsBase<
   P extends ReactNode,
-  E extends ReactNode,
+  F extends ReactNode,
 > = DeferRenderingOptionsBase<P> & {
   /**
-   * エラー時に表示するノード
+   * フォールバック時に表示するノード
    */
-  error?: E;
+  fallback?: F;
 
   /**
-   * errorを表示する際の遅延時間（ミリ秒）
+   * fallbackを表示する際の遅延時間（ミリ秒）
    * 未指定の場合は即表示
    */
-  errorDefer?: number;
+  fallbackDefer?: number;
 
   /**
-   * 一旦errorになったらerror状態を保持するかどうか
-   * trueの場合、error状態になった後にpending状態に戻すことができない
+   * 一旦fallbackになったらfallback状態を保持するかどうか
+   * trueの場合、fallback状態になった後にpending状態に戻すことができない
    */
-  preserveOnceError?: boolean;
+  preserveOnceFallback?: boolean;
 };
 
 /**
  * 描画に関する状態
  */
-export type RenderingState = 'pending' | 'error' | 'ready';
+export type RenderingState = 'pending' | 'fallback' | 'ready';
 
 /**
  * 現在の状態を示す戻り値
@@ -88,7 +88,7 @@ export type DeferRenderingWithHandlersResult<N extends ReactNode> =
      * 描画不可能な状態になった時に実行するハンドラー
      * @returns
      */
-    onError: () => void;
+    onFallback: () => void;
 
     /**
      * 描画可能な状態になった時に実行するハンドラー

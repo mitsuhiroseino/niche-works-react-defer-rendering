@@ -9,7 +9,7 @@ import type { UseDeferUntilAsyncCompleteOptions } from './types';
  * @param target 描画対象のノード
  * @param asyncFn 非同期関数
  * @param options オプション
- * @returns state（'pending', 'ready', 'error'）と状態に応じたノード
+ * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノード
  */
 export default function useDeferUntilAsyncComplete<T extends ReactNode, P, E>(
   target: T,

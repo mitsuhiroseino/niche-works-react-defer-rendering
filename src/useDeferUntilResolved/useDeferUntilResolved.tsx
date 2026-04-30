@@ -10,7 +10,7 @@ import type { UseDeferUntilResolvedOptions } from './types';
  * @param target 描画対象のノード
  * @param promise プロミス
  * @param options オプション
- * @returns state（'pending', 'ready', 'error'）と状態に応じたノード
+ * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノード
  */
 export default function useDeferUntilResolved<T extends ReactNode, P, E>(
   target: T,
@@ -33,7 +33,7 @@ export default function useDeferUntilResolved<T extends ReactNode, P, E>(
         })
         .catch(() => {
           if (isMounted()) {
-            setState('error');
+            setState('fallback');
           }
         });
     }
