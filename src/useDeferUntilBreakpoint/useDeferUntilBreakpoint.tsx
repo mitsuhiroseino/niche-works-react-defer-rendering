@@ -1,4 +1,4 @@
-import useIsMounted from '@niche-works/react/hooks/useIsMounted';
+import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
 import debounce from '@niche-works/utils/timer/debounce';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';

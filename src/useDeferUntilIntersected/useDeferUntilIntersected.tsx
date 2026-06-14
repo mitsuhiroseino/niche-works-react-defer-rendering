@@ -1,5 +1,5 @@
-import useIsMounted from '@niche-works/react/hooks/useIsMounted';
-import unit from '@niche-works/react/utils/unit';
+import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
+import unit from '@niche-works/web-utils/unit';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { DeferRenderingResult } from '../types';

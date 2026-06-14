@@ -1,4 +1,4 @@
-import useIsMounted from '@niche-works/react/hooks/useIsMounted';
+import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
 import setTimeoutExtended from '@niche-works/utils/timer/setTimeoutExtended';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
