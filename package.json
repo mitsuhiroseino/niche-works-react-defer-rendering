@@ -1,6 +1,6 @@
 {
   "name": "@niche-works/react-defer-rendering",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "keywords": [
     "react",
@@ -31,10 +31,9 @@
     "tidy": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\" --config ./prettier.tidy.config.ts"
   },
   "dependencies": {
-    "@niche-works/react-style-proxy": "^0.2.1",
     "@niche-works/react-utils": "^0.1.0",
-    "@niche-works/types": "^0.3.2",
-    "@niche-works/utils": "^0.4.2",
+    "@niche-works/types": "^0.4.0",
+    "@niche-works/utils": "^0.5.0",
     "@niche-works/web-utils": "^0.1.1",
     "fontfaceobserver": "^2.3.0",
     "remeda": "^2.33.6",
