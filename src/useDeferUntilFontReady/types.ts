@@ -1,5 +1,6 @@
 import type { FontVariant } from 'fontfaceobserver';
 import type { ReactNode } from 'react';
+import type { RenderingState } from '../types';
 import type { UseDeferUntilReadyOptions } from '../useDeferUntilReady';
 
 export type UseDeferUntilFontReadyOptions<
@@ -23,4 +24,11 @@ export type UseDeferUntilFontReadyOptions<
    * @returns
    */
   loader?: () => Promise<void>;
+
+  /**
+   * SSR時など、実際のフォント読み込み状態を判定できない環境での初期状態\
+   * デフォルトは'pending'
+   * @default 'pending'
+   */
+  initialState?: RenderingState;
 };

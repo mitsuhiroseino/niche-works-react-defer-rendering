@@ -1,18 +1,24 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { useCallback, useRef } from 'react';
 import type { DeferRenderingWithHandlersResult } from '../types';
 import useDeferUntilOnReady from '../useDeferUntilOnReady';
-import type { UseDeferUntilCalledCountOptions } from './types';
+import type { UseDeferUntilCallThresholdOptions } from './types';
 
 /**
- * 戻り値として返す`onReady`が実行されるまで描画を遅延させるhook
+ * 戻り値として返す`onReady`等のハンドラーが指定回数呼ばれるまで描画を遅延させるhook
  * @param target 描画対象のノード
  * @param options オプション
  * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノードと状態変更用のハンドラー
  */
-export default function useDeferUntilCalledCount<T extends ReactNode, P, E>(
+export default function useDeferUntilCallThreshold<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+  E extends ReactNode = ReactNode,
+>(
   target: T,
-  options: UseDeferUntilCalledCountOptions<P, E>,
+  options: UseDeferUntilCallThresholdOptions<P, E>,
 ): DeferRenderingWithHandlersResult<T | P | E> {
   const {
     onPendingCount = 1,

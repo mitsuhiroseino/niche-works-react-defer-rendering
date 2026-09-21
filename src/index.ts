@@ -1,3 +1,5 @@
+'use client';
+
 export type {
   DeferRenderingResult,
   DeferRenderingWithHandlersResult,
@@ -7,8 +9,8 @@ export { default as useDeferUntilAsyncComplete } from './useDeferUntilAsyncCompl
 export type { UseDeferUntilAsyncCompleteOptions } from './useDeferUntilAsyncComplete';
 export { default as useDeferUntilBreakpoint } from './useDeferUntilBreakpoint';
 export type { UseDeferUntilBreakpointOptions } from './useDeferUntilBreakpoint';
-export { default as useDeferUntilCalledCount } from './useDeferUntilCalledCount';
-export type { UseDeferUntilCalledCountOptions } from './useDeferUntilCalledCount';
+export { default as useDeferUntilCallThreshold } from './useDeferUntilCallThreshold';
+export type { UseDeferUntilCallThresholdOptions } from './useDeferUntilCallThreshold';
 export { default as useDeferUntilChange } from './useDeferUntilChange';
 export type { UseDeferUntilChangeOptions } from './useDeferUntilChange';
 export { default as useDeferUntilDate } from './useDeferUntilDate';

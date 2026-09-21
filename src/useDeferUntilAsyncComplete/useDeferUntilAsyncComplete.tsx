@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import type { DeferRenderingResult } from '../types';
@@ -11,7 +13,11 @@ import type { UseDeferUntilAsyncCompleteOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノード
  */
-export default function useDeferUntilAsyncComplete<T extends ReactNode, P, E>(
+export default function useDeferUntilAsyncComplete<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+  E extends ReactNode = ReactNode,
+>(
   target: T,
   asyncFn: (() => Promise<void>) | null | undefined,
   options: UseDeferUntilAsyncCompleteOptions<P, E> = {},

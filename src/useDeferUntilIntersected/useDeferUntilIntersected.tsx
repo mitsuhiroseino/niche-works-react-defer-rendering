@@ -1,7 +1,8 @@
-import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
+'use client';
+
 import unit from '@niche-works/web-utils/unit';
 import type { ReactNode, RefObject } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 import type { DeferRenderingResult } from '../types';
 import useDeferUntilTrue from '../useDeferUntilTrue';
 import type { UseDeferUntilIntersectedOptions } from './types';
@@ -13,7 +14,10 @@ import type { UseDeferUntilIntersectedOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilIntersected<T extends ReactNode, P>(
+export default function useDeferUntilIntersected<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   elementRef: RefObject<HTMLElement | null | undefined>,
   options: UseDeferUntilIntersectedOptions<P> = {},
@@ -23,20 +27,26 @@ export default function useDeferUntilIntersected<T extends ReactNode, P>(
     rootRef = defaultRootRef,
     rootMargin,
     threshold = 0.1,
+    initialCondition = false,
     ...opts
   } = options;
-  const [condition, setCondition] = useState(false);
-  const isMounted = useIsMounted();
+  // IntersectionObserverは同期的に現在値を取得できないため、直近の通知結果を保持する
+  const snapshotRef = useRef(initialCondition);
 
-  useEffect(() => {
-    const element = elementRef.current;
-    const container = rootRef.current;
-    if (element) {
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const element = elementRef.current;
+      const container = rootRef.current;
+      if (!element) {
+        return () => {};
+      }
+
       const observer = new IntersectionObserver(
         (entries) => {
-          if (isMounted()) {
-            const entry = entries[0];
-            setCondition(entry.isIntersecting);
+          const entry = entries[0];
+          if (snapshotRef.current !== entry.isIntersecting) {
+            snapshotRef.current = entry.isIntersecting;
+            onStoreChange();
           }
         },
         {
@@ -51,8 +61,21 @@ export default function useDeferUntilIntersected<T extends ReactNode, P>(
       return () => {
         observer.disconnect(); // クリーンアップ
       };
-    }
-  }, [elementRef.current, rootRef.current, threshold, rootMargin]);
+    },
+    [elementRef.current, rootRef.current, threshold, rootMargin],
+  );
+  const getSnapshot = useCallback(() => snapshotRef.current, []);
+  // SSR時は実際の交差状態を判定できないためinitialConditionを使う
+  const getServerSnapshot = useCallback(
+    () => initialCondition,
+    [initialCondition],
+  );
+
+  const condition = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   return useDeferUntilTrue(target, condition, opts);
 }

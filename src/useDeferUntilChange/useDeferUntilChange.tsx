@@ -1,3 +1,5 @@
+'use client';
+
 import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -14,7 +16,10 @@ const NO_VALUE = Symbol('NO_VALUE');
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilChange<T extends ReactNode, P>(
+export default function useDeferUntilChange<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   value: unknown,
   options: UseDeferUntilChangeOptions<P> = {},

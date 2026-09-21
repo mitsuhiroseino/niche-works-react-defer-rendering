@@ -21,4 +21,11 @@ export type UseDeferUntilScrolledOptions<P extends ReactNode = ReactNode> =
      * 検知するスクロールの方向
      */
     direction?: 'vertical' | 'horizontal';
+
+    /**
+     * SSR時など、実際のスクロール位置を判定できない環境での初期値\
+     * デフォルトはfalse
+     * @default false
+     */
+    initialCondition?: boolean;
   };

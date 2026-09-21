@@ -1,3 +1,5 @@
+'use client';
+
 import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
 import debounce from '@niche-works/utils/timer/debounce';
 import type { ReactNode, RefObject } from 'react';
@@ -13,28 +15,31 @@ import type { UseDeferUntilScrolledOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilScrolled<T extends ReactNode, P>(
+export default function useDeferUntilScrolled<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   elementRef: RefObject<HTMLElement | null | undefined>,
   options: UseDeferUntilScrolledOptions<P> = {},
 ): DeferRenderingResult<T | P> {
-  const defaultRootRef = useRef<Element | null | undefined>(
-    document.documentElement,
-  );
+  // document参照はレンダー時ではなくeffect内で解決する（SSRでは`document`が存在しないため）
+  const defaultRootRef = useRef<Element | null | undefined>(null);
   const {
     rootRef = defaultRootRef,
     rootMargin = 0,
     detectionDelay = 100,
     preserveOnceReady,
     direction = 'vertical',
+    initialCondition = false,
     ...opts
   } = options;
-  const [condition, setCondition] = useState(false);
+  const [condition, setCondition] = useState(initialCondition);
   const isMounted = useIsMounted();
 
   useEffect(() => {
     const element = elementRef.current;
-    const root = rootRef.current;
+    const root = rootRef.current ?? document.documentElement;
     if (element && root) {
       const isVisible =
         direction === 'vertical'

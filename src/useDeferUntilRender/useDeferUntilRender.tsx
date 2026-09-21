@@ -1,6 +1,8 @@
-import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
+'use client';
+
+import debounce from '@niche-works/utils/timer/debounce';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 import type { DeferRenderingResult } from '../types';
 import useDeferUntilTrue from '../useDeferUntilTrue';
 import type { UseDeferUntilRenderOptions } from './types';
@@ -12,39 +14,72 @@ import type { UseDeferUntilRenderOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilRender<T extends ReactNode, P>(
+export default function useDeferUntilRender<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   query: string,
   options: UseDeferUntilRenderOptions<P> = {},
 ): DeferRenderingResult<T | P> {
-  const { interval = 400, preserveOnceReady, ...opts } = options;
-  const [condition, setCondition] = useState(false);
-  const isMounted = useIsMounted();
+  const defaultRootRef = useRef<Element | Document | null | undefined>(null);
+  const {
+    rootRef = defaultRootRef,
+    detectionDelay = 100,
+    preserveOnceReady,
+    initialCondition = false,
+    ...opts
+  } = options;
 
-  useEffect(() => {
-    if (query) {
-      const intervalId = setInterval(() => {
-        const element = document.querySelector(query);
-        if (element) {
-          if (isMounted()) {
-            setCondition(true);
-          }
-          if (preserveOnceReady) {
-            // 一度readyになったらready状態を保持する場合はintervalをクリアする
-            clearInterval(intervalId);
-          }
-        } else {
-          if (isMounted()) {
-            setCondition(false);
-          }
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      if (!query) {
+        return () => {};
+      }
+      const root = rootRef.current ?? document;
+      if (preserveOnceReady && root.querySelector(query)) {
+        // 一度readyになったらready状態を保持する場合で既にreadyな場合は監視不要
+        return () => {};
+      }
+
+      const handleMutation = () => {
+        onStoreChange();
+        if (preserveOnceReady && root.querySelector(query)) {
+          // 一度readyになったらready状態を保持する場合でreadyになった場合はこれで終わり
+          observer.disconnect();
         }
-      }, interval);
+      };
+      const debouncedHandleMutation = debounce(
+        handleMutation,
+        detectionDelay,
+      );
+      const observer = new MutationObserver(debouncedHandleMutation);
+      observer.observe(root, { childList: true, subtree: true });
 
       return () => {
-        clearInterval(intervalId);
+        observer.disconnect();
       };
+    },
+    [query, rootRef.current, detectionDelay, preserveOnceReady],
+  );
+  const getSnapshot = useCallback(() => {
+    if (!query) {
+      return false;
     }
-  }, [query]);
+    const root = rootRef.current ?? document;
+    return root.querySelector(query) != null;
+  }, [query, rootRef.current]);
+  // SSR時は実際のDOMを判定できないためinitialConditionを使う
+  const getServerSnapshot = useCallback(
+    () => initialCondition,
+    [initialCondition],
+  );
+
+  const condition = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   return useDeferUntilTrue(target, condition, { preserveOnceReady, ...opts });
 }

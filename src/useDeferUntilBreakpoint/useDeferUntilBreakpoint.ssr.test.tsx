@@ -1,0 +1,33 @@
+// @vitest-environment node
+import { renderToString } from 'react-dom/server';
+import { describe, expect, it } from 'vitest';
+import useDeferUntilBreakpoint from './useDeferUntilBreakpoint';
+
+function Fixture({ initialCondition }: { initialCondition?: boolean }) {
+  const { node } = useDeferUntilBreakpoint(
+    'ready-content',
+    '(max-width: 768px)',
+    { pending: 'pending-content', initialCondition },
+  );
+  return <>{node}</>;
+}
+
+describe('useDeferUntilBreakpoint (SSR)', () => {
+  it('window/matchMediaが存在しない環境でもrenderToStringが例外なく完了する', () => {
+    // getSnapshotはwindow.matchMediaに依存するため、
+    // SSR時にgetServerSnapshotへ正しくフォールバックできていないとここで例外になる
+    expect(() => renderToString(<Fixture />)).not.toThrow();
+  });
+
+  it('initialConditionを指定しない場合、pending側のノードがSSR出力に含まれる', () => {
+    const html = renderToString(<Fixture />);
+    expect(html).toContain('pending-content');
+    expect(html).not.toContain('ready-content');
+  });
+
+  it('initialCondition: trueを指定した場合、ready側のノードがSSR出力に含まれる', () => {
+    const html = renderToString(<Fixture initialCondition />);
+    expect(html).toContain('ready-content');
+    expect(html).not.toContain('pending-content');
+  });
+});

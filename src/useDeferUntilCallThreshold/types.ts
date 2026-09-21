@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { UseDeferUntilOnReadyOptions } from '../useDeferUntilOnReady';
 
-export type UseDeferUntilCalledCountOptions<
+export type UseDeferUntilCallThresholdOptions<
   P extends ReactNode = ReactNode,
   E extends ReactNode = ReactNode,
 > = UseDeferUntilOnReadyOptions<P, E> & {

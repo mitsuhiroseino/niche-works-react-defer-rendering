@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import type { DeferRenderingResult } from '../types';
 import useDeferUntilReady from '../useDeferUntilReady';
@@ -10,7 +12,10 @@ import type { UseDeferUntilTrueOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilTrue<T extends ReactNode, P>(
+export default function useDeferUntilTrue<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   condition: boolean | null | undefined,
   options: UseDeferUntilTrueOptions<P>,

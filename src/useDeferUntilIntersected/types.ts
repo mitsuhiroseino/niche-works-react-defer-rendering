@@ -23,4 +23,11 @@ export type UseDeferUntilIntersectedOptions<P extends ReactNode = ReactNode> =
        * @default 0.1
        */
       threshold?: number;
+
+      /**
+       * SSR時など、実際の交差状態を判定できない環境での初期値\
+       * デフォルトはfalse
+       * @default false
+       */
+      initialCondition?: boolean;
     };

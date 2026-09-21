@@ -1,7 +1,8 @@
-import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
+'use client';
+
 import debounce from '@niche-works/utils/timer/debounce';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import type { DeferRenderingResult } from '../types';
 import useDeferUntilTrue from '../useDeferUntilTrue';
 import type { UseDeferUntilBreakpointOptions } from './types';
@@ -13,44 +14,61 @@ import type { UseDeferUntilBreakpointOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilBreakpoint<T extends ReactNode, P>(
+export default function useDeferUntilBreakpoint<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   mediaQuery: string,
   options: UseDeferUntilBreakpointOptions<P> = {},
 ): DeferRenderingResult<T | P> {
-  const { detectionDelay = 100, preserveOnceReady, ...opts } = options;
-  const [condition, setCondition] = useState(false);
-  const isMounted = useIsMounted();
+  const {
+    detectionDelay = 100,
+    preserveOnceReady,
+    initialCondition = false,
+    ...opts
+  } = options;
 
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia(mediaQuery);
-
-    // 初期状態の設定
-    const matches = mediaQueryList.matches;
-    setCondition(matches);
-    if (preserveOnceReady && matches) {
-      // 一度readyになったらready状態を保持する場合で既にreadyな場合は何もしない
-      return;
-    }
-
-    // メディアクエリの変更を監視
-    const handleChange = debounce((event: MediaQueryListEvent) => {
-      if (isMounted()) {
-        const matches = event.matches;
-        setCondition(matches);
-        if (preserveOnceReady && matches) {
-          // 一度readyになったらready状態を保持する場合でreadyになった場合はこれで終わり
-          mediaQueryList.removeEventListener('change', handleChange);
-        }
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const mediaQueryList = window.matchMedia(mediaQuery);
+      if (preserveOnceReady && mediaQueryList.matches) {
+        // 一度readyになったらready状態を保持する場合で既にreadyな場合は監視不要
+        return () => {};
       }
-    }, detectionDelay);
 
-    mediaQueryList.addEventListener('change', handleChange);
+      const handleChange = (event: MediaQueryListEvent) => {
+        onStoreChange();
+        if (preserveOnceReady && event.matches) {
+          // 一度readyになったらready状態を保持する場合でreadyになった場合はこれで終わり
+          mediaQueryList.removeEventListener('change', debouncedHandleChange);
+        }
+      };
+      const debouncedHandleChange = debounce(handleChange, detectionDelay);
 
-    return () => {
-      mediaQueryList.removeEventListener('change', handleChange);
-    };
-  }, [mediaQuery, preserveOnceReady, detectionDelay]);
+      mediaQueryList.addEventListener('change', debouncedHandleChange);
+
+      return () => {
+        mediaQueryList.removeEventListener('change', debouncedHandleChange);
+      };
+    },
+    [mediaQuery, preserveOnceReady, detectionDelay],
+  );
+  const getSnapshot = useCallback(
+    () => window.matchMedia(mediaQuery).matches,
+    [mediaQuery],
+  );
+  // SSR時は実際のメディアクエリーを判定できないためinitialConditionを使う
+  const getServerSnapshot = useCallback(
+    () => initialCondition,
+    [initialCondition],
+  );
+
+  const condition = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   return useDeferUntilTrue(target, condition, { preserveOnceReady, ...opts });
 }

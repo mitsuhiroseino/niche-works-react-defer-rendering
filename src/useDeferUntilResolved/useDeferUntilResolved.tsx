@@ -1,3 +1,5 @@
+'use client';
+
 import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -12,7 +14,11 @@ import type { UseDeferUntilResolvedOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノード
  */
-export default function useDeferUntilResolved<T extends ReactNode, P, E>(
+export default function useDeferUntilResolved<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+  E extends ReactNode = ReactNode,
+>(
   target: T,
   promise: Promise<unknown> | null | undefined,
   options: UseDeferUntilResolvedOptions<P, E> = {},

@@ -1,3 +1,5 @@
+'use client';
+
 import debounce from '@niche-works/utils/timer/debounce';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
@@ -14,7 +16,11 @@ import type { UseDeferUntilOnReadyOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready', 'fallback'）と状態に応じたノードと状態変更用のハンドラー
  */
-export default function useDeferUntilCalledCount<T extends ReactNode, P, E>(
+export default function useDeferUntilOnReady<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+  E extends ReactNode = ReactNode,
+>(
   target: T,
   options: UseDeferUntilOnReadyOptions<P, E>,
 ): DeferRenderingWithHandlersResult<T | P | E> {

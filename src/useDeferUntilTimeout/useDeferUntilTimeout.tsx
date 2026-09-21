@@ -1,3 +1,5 @@
+'use client';
+
 import useIsMounted from '@niche-works/react-utils/hooks/useIsMounted';
 import setTimeoutExtended from '@niche-works/utils/timer/setTimeoutExtended';
 import type { ReactNode } from 'react';
@@ -13,7 +15,10 @@ import type { UseDeferUntilTimeoutOptions } from './types';
  * @param options オプション
  * @returns state（'pending', 'ready'）と状態に応じたノード
  */
-export default function useDeferUntilTimeout<T extends ReactNode, P>(
+export default function useDeferUntilTimeout<
+  T extends ReactNode,
+  P extends ReactNode = ReactNode,
+>(
   target: T,
   defer: number | null | undefined,
   options: UseDeferUntilTimeoutOptions<P> = {},
